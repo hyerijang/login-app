@@ -6,7 +6,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,7 +29,8 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     private boolean cookieSecure;
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+        throws IOException, ServletException {
         try {
             String refreshRaw = null;
             Cookie[] cookies = request.getCookies();
@@ -89,7 +89,8 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             if (request.getSession(false) != null) {
                 request.getSession(false).invalidate();
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
 
         // Redirect to home
         response.sendRedirect("/");

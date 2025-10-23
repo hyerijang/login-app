@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserDetail extends BaseTimeEntity{
+public class UserDetail extends BaseTimeEntity {
 
 
     @Id

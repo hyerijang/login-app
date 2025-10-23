@@ -1,4 +1,3 @@
-
 package com.koreanmarkers.assignment.login_app.repository;
 
 import com.koreanmarkers.assignment.login_app.domain.AuthProvider;

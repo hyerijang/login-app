@@ -19,7 +19,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
         try {
             String token = resolveTokenFromCookies(request);
             if (token != null && jwtTokenProvider.validateToken(token)) {
@@ -37,7 +38,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null) return null;
+        if (cookies == null) {
+            return null;
+        }
         for (Cookie cookie : cookies) {
             if ("access_token".equals(cookie.getName())) {
                 return cookie.getValue();

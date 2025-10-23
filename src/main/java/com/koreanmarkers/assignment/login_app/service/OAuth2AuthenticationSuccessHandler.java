@@ -37,20 +37,21 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private boolean cookieSecure;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        if (!(authentication instanceof OAuth2AuthenticationToken)) {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
+        if (!(authentication instanceof OAuth2AuthenticationToken oauthToken)) {
             response.sendRedirect("/");
             return;
         }
 
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         OAuth2User oauthUser = oauthToken.getPrincipal();
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
         AuthProvider provider = mapProvider(registrationId);
         Map<String, Object> attributes = oauthUser.getAttributes();
         String providerId = extractProviderId(provider, attributes);
 
-        Optional<User> userOpt = userRepository.findByAuthProviders_ProviderAndAuthProviders_ProviderId(provider, providerId);
+        Optional<User> userOpt =
+            userRepository.findByAuthProviders_ProviderAndAuthProviders_ProviderId(provider, providerId);
         if (userOpt.isEmpty()) {
             response.sendRedirect("/?error=user_not_found");
             return;
@@ -67,21 +68,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         int accessMaxAge = (int) (jwtExpirationMs / 1000);
         int refreshMaxAge = (int) (refreshTokenExpirationMs / 1000);
 
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
-            .httpOnly(true)
-            .secure(cookieSecure)
-            .path("/")
-            .maxAge(accessMaxAge)
-            .sameSite("Lax")
-            .build();
+        ResponseCookie accessCookie =
+            ResponseCookie.from("access_token", accessToken).httpOnly(true).secure(cookieSecure).path("/")
+                .maxAge(accessMaxAge).sameSite("Lax").build();
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshTokenRaw)
-            .httpOnly(true)
-            .secure(cookieSecure)
-            .path("/")
-            .maxAge(refreshMaxAge)
-            .sameSite("Lax")
-            .build();
+        ResponseCookie refreshCookie =
+            ResponseCookie.from("refresh_token", refreshTokenRaw).httpOnly(true).secure(cookieSecure).path("/")
+                .maxAge(refreshMaxAge).sameSite("Lax").build();
 
         response.addHeader("Set-Cookie", accessCookie.toString());
         response.addHeader("Set-Cookie", refreshCookie.toString());

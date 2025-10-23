@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Table(name = "user_account")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserAccount extends BaseTimeEntity{
+public class UserAccount extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
