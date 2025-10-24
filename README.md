@@ -1,17 +1,45 @@
 # login-app
 
 ## 개요
-Google OAuth2로 로그인하고, 로그인 성공 시 JWT 액세스 토큰과 리프레시 토큰(raw)을 쿠키로 전달합니다. 리프레시 토큰은 서버에 SHA-256 해시로 저장합니다. 개발용 H2 데이터베이스와 Thymeleaf + Bootstrap 기반 UI를 제공합니다.
 
-## 화면 시안
+Google OAuth2로 로그인하고, 로그인 성공 시 JWT 액세스 토큰(access token)과 리프레시 토큰(refresh token, raw)을 쿠키로 전달하는 간단한 예제 Spring Boot
+애플리케이션입니다. 리프레시 토큰은 서버에 SHA-256 해시로 저장하여 원본 토큰을 안전하게 관리합니다. 개발용으로 H2 인메모리 데이터베이스와 Thymeleaf 기반의 UI(부트스트랩 포함)를 제공합니다.
+
+주요 기능
+
+- Google OAuth2 로그인 연동
+- JWT 액세스 토큰 발급 및 쿠키 전송
+- 리프레시 토큰 저장(해시) 및 관리
+- H2 DB(개발용), Thymeleaf 템플릿, Bootstrap UI
+
+### 개발 환경
+<div style="text-align:center">
+  <img alt="Java 17 badge" src="https://img.shields.io/badge/Java%20-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
+  <img alt="Gradle 8.14.3 badge" src="https://img.shields.io/badge/Gradle-8.14.3-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+  <img alt="Spring Boot 3.5.6 badge" src="https://img.shields.io/badge/Spring%20Boot-3.5.6-6DB33F?style=for-the-badge&logo=spring&logoColor=white" />
+</div>
+<div style="text-align:center">
+  <img alt="Spring Security OAuth2 Client 6.5.5 badge" src="https://img.shields.io/badge/Spring%20Security%20OAuth2%20Client-6.5.5-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white" />
+  <img alt="H2 2.1.214 badge" src="https://img.shields.io/badge/H2-2.1.214-0F172A?style=for-the-badge&logo=h2-database&logoColor=white" />
+  <img alt="Spring Data JPA badge" src="https://img.shields.io/badge/Spring%20Data%20JPA-3.5.6-6DB33F?style=for-the-badge&logo=spring&logoColor=white" />
+</div>
+<div style="text-align:center">
+  <img alt="Thymeleaf 3.3.6 badge" src="https://img.shields.io/badge/Thymeleaf-3.5.6-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white" />
+  <img alt="Bootstrap 5.3.3 badge" src="https://img.shields.io/badge/Bootstrap-5.3.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+  <img alt="GitHub badge" src="https://img.shields.io/badge/GitHub-–-100000?style=for-the-badge&logo=github&logoColor=white" />
+</div>
+
+## 화면 및 다이어그램
 
 ### 로그인
+
 <img src="https://github.com/user-attachments/assets/c1261ae9-7728-495a-9d7f-153d8e3fc899" alt="login1" width="24%" />
 <img src="https://github.com/user-attachments/assets/4f08070d-f466-4fee-99e5-9f49e060c574" alt="login2" width="24%" />
 <img src="https://github.com/user-attachments/assets/035ec54e-8251-4bbc-a971-fc39caddf2eb" alt="login3" width="24%" />
 <img src="https://github.com/user-attachments/assets/f3c686df-d771-4cd2-af51-ef11281d52ef" alt="logout" width="24%" />
 
 ### 로그아웃
+
 <img src="https://github.com/user-attachments/assets/f3c686df-d771-4cd2-af51-ef11281d52ef" alt="logout" width="24%" />
 <img src="https://github.com/user-attachments/assets/c1261ae9-7728-495a-9d7f-153d8e3fc899" alt="login1" width="24%" />
 
@@ -73,7 +101,6 @@ erDiagram
 
 ```
 
-
 ## 시퀀스 다이어그램
 
 ### 로그인
@@ -125,26 +152,60 @@ sequenceDiagram
     Home-->>Browser: 비로그인 화면
 ```
 
-## 설정(빠른 체크)
-`src/main/resources/application.properties`에서 다음 값을 확인/수정하세요:
-- `spring.security.oauth2.client.registration.google.client-id`
-- `spring.security.oauth2.client.registration.google.client-secret`
-- `app.jwt.secret` (JWT 서명용)
-- `app.jwt.expiration-ms`, `app.refresh-token.expiration-ms`
-- `app.cookie.secure` (개발: false, 운영: true)
-- JPA 설정(`spring.jpa.hibernate.ddl-auto`)은 운영 환경에서 적절히 변경
+## 요구사항 (로컬 개발)
 
-## 실행 (Windows)
-프로젝트 루트에서:
+- Java 17 이상 (프로젝트 설정에 따라 다름)
+- Gradle Wrapper (프로젝트에 포함됨)
+- 인터넷 연결 (Google OAuth2 인증을 위해)
 
-```cmd
+## 설정
+
+애플리케이션 설정은 `src/main/resources/application.properties` 또는 운영 환경의 환경 변수로 제공합니다.
+다음 값들을 반드시 설정하세요:
+
+- spring.security.oauth2.client.registration.google.client-id
+- spring.security.oauth2.client.registration.google.client-secret
+- app.jwt.secret (JWT 서명용 비밀)
+
+예시(환경변수 사용 권장)
+
+- 윈도우 cmd 예시:
+
+  setx SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID "your-client-id"
+  setx SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET "your-client-secret"
+  setx APP_JWT_SECRET "your-jwt-secret"
+
+(참고: 실제 운영에서는 환경변수나 시크릿 매니저를 사용하세요.)
+
+## 빌드 및 실행 (Windows)
+
+프로젝트 루트에서 다음 명령을 실행합니다:
+
 gradlew.bat clean build
 gradlew.bat bootRun
-```
-웹브라우저에서 `http://localhost:8080/` 접속
-H2 콘솔: `http://localhost:8080/h2-console`
 
-## 주의사항
-- 실제 운영 시 `app.jwt.secret`과 OAuth 클라이언트 시크릿을 환경변수 또는 시크릿 매니저로 관리하세요.
-- `spring.jpa.hibernate.ddl-auto=create-drop`는 개발 전용입니다.
-- HTTPS(또는 `app.cookie.secure=true`) 환경에서 쿠키 보안을 반드시 적용하세요.
+정상 실행 시 브라우저에서 http://localhost:8080/ 접속
+H2 콘솔: http://localhost:8080/h2-console (개발 중에만 사용)
+
+테스트 실행:
+
+gradlew.bat test
+
+## 보안 주의사항
+
+- `app.jwt.secret`과 OAuth 클라이언트 시크릿은 절대 버전관리 시스템에 커밋하지 마세요.
+- 운영 환경에서는 HTTPS를 사용하고 `app.cookie.secure=true`를 설정하세요.
+- `spring.jpa.hibernate.ddl-auto=create-drop` 또는 `update` 설정은 운영에 적합하지 않을 수 있습니다.
+
+## 디렉터리 (주요)
+
+- src/main/java/.../controller : 컨트롤러
+- src/main/java/.../service : 서비스 로직
+- src/main/java/.../repository : JPA 리포지토리
+- src/main/resources/templates : Thymeleaf 템플릿
+- src/main/resources/application.properties : 환경설정
+
+## 가정 및 참고
+
+- 이 README는 로컬 개발 환경을 기준으로 작성되었습니다.
+- OAuth 클라이언트 등록(구글 콘솔)과 리디렉션 URI 설정은 사용자가 직접 수행해야 합니다.
